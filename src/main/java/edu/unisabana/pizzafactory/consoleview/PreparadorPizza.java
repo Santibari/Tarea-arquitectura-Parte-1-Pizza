@@ -1,60 +1,81 @@
 
 package edu.unisabana.pizzafactory.consoleview;
-
-import edu.unisabana.pizzafactory.model.AmasadorPizzaDelgada;
+import edu.unisabana.pizzafactory.model.*;
 import edu.unisabana.pizzafactory.model.ExcepcionParametrosInvalidos;
-import edu.unisabana.pizzafactory.model.HorneadorPizzaDelgada;
 import edu.unisabana.pizzafactory.model.Ingrediente;
-import edu.unisabana.pizzafactory.model.MoldeadorPizzaDelgada;
 import edu.unisabana.pizzafactory.model.Tamano;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 /**
  *
  * @author cesarvefe
  */
 public class PreparadorPizza {
 
-    public static void main(String args[]){
+    public static void main(String[] args) {
         try {
-            Ingrediente[] ingredientes=new Ingrediente[]{new Ingrediente("queso",1),new Ingrediente("jamon",2)};            
-            PreparadorPizza pp=new PreparadorPizza();            
-            pp.prepararPizza(ingredientes, Tamano.MEDIANO);
+            Ingrediente[] ingredientes = new Ingrediente[]{
+                new Ingrediente("queso", 1),
+                new Ingrediente("jamon", 2)
+            };
+            PreparadorPizza pp = new PreparadorPizza();
+              Pizza pizza = seleccionarPizzaAleatoria();
+            Tamano tamano = seleccionarTamanoAleatorio();
+            pp.prepararPizza(pizza, ingredientes, tamano);
         } catch (ExcepcionParametrosInvalidos ex) {
-            Logger.getLogger(PreparadorPizza.class.getName()).log(Level.SEVERE, "Problema en la preparacion de la Pizza", ex);
+            Logger.getLogger(PreparadorPizza.class.getName()).log(Level.SEVERE, "Problema en la preparación de la Pizza", ex);
         }
-                
     }
-    
-    
-    public void prepararPizza(Ingrediente[] ingredientes, Tamano tam)
+
+    public void prepararPizza(Pizza pizza, Ingrediente[] ingredientes, Tamano tam) 
             throws ExcepcionParametrosInvalidos {
-        AmasadorPizzaDelgada am = new AmasadorPizzaDelgada();
-        HorneadorPizzaDelgada hpd = new HorneadorPizzaDelgada();
-        MoldeadorPizzaDelgada mp = new MoldeadorPizzaDelgada();
+        Amasar am = pizza.createAmasarPizza();
+        Hornear h= pizza.createHornearPizza();
+        Moldear m = pizza.createMoldearPizza();
+
         am.amasar();
+
         if (tam == Tamano.PEQUENO) {
-            mp.moldearPizzaPequena();
+            m.moldearPizzaPequeña();
         } else if (tam == Tamano.MEDIANO) {
-            mp.molderarPizzaMediana();
+            m.moldearPizzaMediana();
         } else {
-            throw new ExcepcionParametrosInvalidos("Tamano de piza invalido:"+tam);
+            throw new ExcepcionParametrosInvalidos("Tamaño de pizza inválido: " + tam);
         }
-	aplicarIngredientes(ingredientes);
-        hpd.hornear();
+
+        aplicarIngredientes(ingredientes);
+        h.hornear();
     }
 
     private void aplicarIngredientes(Ingrediente[] ingredientes) {
         Logger.getLogger(PreparadorPizza.class.getName())
-                .log(Level.INFO, "APLICANDO INGREDIENTES!:{0}", Arrays.toString(ingredientes));
+                .log(Level.INFO, "APLICANDO INGREDIENTES!: {0}", Arrays.toString(ingredientes));
         
-        //CODIGO DE LLAMADO AL MICROCONTROLADOR
-        
-        
-        
+        // CODIGO DE LLAMADO AL MICROCONTROLADOR
+    }
+      private static Pizza seleccionarPizzaAleatoria() {
+        Random rand = new Random();
+        int tipoPizza = rand.nextInt(3); // Genera un número entre 0 y 2
+
+        switch (tipoPizza) {
+            case 0:
+                return new PizzaDelgada();
+            case 1:
+                return new PizzaGruesa();
+            case 2:
+                return new PizzaIntegral();
+            default:
+                throw new IllegalStateException("Valor inesperado para tipoPizza: " + tipoPizza);
+        }
     }
 
+    private static Tamano seleccionarTamanoAleatorio() {
+        Random rand = new Random();
+        int tipoTamano = rand.nextInt(Tamano.values().length); // Genera un número entre 0 y el número de elementos en Tamano
 
+        return Tamano.values()[tipoTamano];
+    }
 }
+

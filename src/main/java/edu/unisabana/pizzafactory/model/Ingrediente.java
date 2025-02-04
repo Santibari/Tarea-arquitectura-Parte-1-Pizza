@@ -1,10 +1,6 @@
 
 package edu.unisabana.pizzafactory.model;
 
-/**
- *
- * @author cesarvefe
- */
 public class Ingrediente {
     private String nombre;
     private int cantidad;
